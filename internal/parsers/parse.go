@@ -4,7 +4,7 @@ import (
 	"csvCalc/internal"
 	"csvCalc/internal/models"
 	"encoding/csv"
-	"fmt"
+	"errors"
 	"os"
 )
 
@@ -29,38 +29,33 @@ func ReadCSV(filePath string) ([][]string, error) {
 	return records, nil
 }
 
-func ParseRecords(records [][]string) (map[models.Cell]string, []models.Cell) {
-	var equations []models.Cell
+func ParseRecords(records [][]string) (map[models.Cell]string, []models.Cell, error) {
+	var cellsToCalc []models.Cell
 	table := make(map[models.Cell]string, 0)
-	//prevRowName := ""
+	prevRowName := ""
 	columnName := records[0]
+	if !internal.CheckColumns(records[0]) {
+		return nil, nil, errors.New("wrong columns format")
+	}
 	for _, record := range records[1:] {
 		row := record
 		rowName := row[0]
-		//if prevRowName == rowName {
-		//	fmt.Println("here")
-		//} else {
-		//	prevRowName = rowName
-		//}
+		if prevRowName == rowName {
+			return nil, nil, errors.New("wrong table format")
+		}
+		prevRowName = rowName
 		for ind, val := range row[1:] {
-			valType, ok := internal.ValidateValue(val)
-			if !ok {
-				fmt.Println('1')
-			}
-
 			cell := models.Cell{
 				Column: columnName[ind+1],
 				Row:    rowName,
 			}
-
-			if valType == "string" {
-				//equations = append(equations, columnName[ind+1]+rowName)
-				equations = append(equations, cell)
+			if internal.IsExpression(val) {
+				cellsToCalc = append(cellsToCalc, cell)
+			} else if !internal.IsNumber(val) {
+				return nil, nil, errors.New("only numbers and expressions can be cell's value")
 			}
-
-			//table[columnName[ind+1]+rowName] = val
 			table[cell] = val
 		}
 	}
-	return table, equations
+	return table, cellsToCalc, nil
 }

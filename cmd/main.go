@@ -1,8 +1,8 @@
 package main
 
 import (
-	"csvCalc/internal"
 	"csvCalc/internal/parsers"
+	"csvCalc/internal/solve"
 	"fmt"
 	"log"
 )
@@ -13,23 +13,18 @@ func main() {
 	if err != nil {
 		log.Fatal("error while reading file")
 	}
-	table, calcCell := parsers.ParseRecords(records)
+	table, calcCells, err := parsers.ParseRecords(records)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(table)
-	fmt.Println(calcCell)
+	fmt.Println(calcCells)
 
-	internal.SolveTable(table, calcCell)
+	if len(calcCells) != 0 {
+		if err = solve.SolveTable(table, calcCells); err != nil {
+			log.Fatal(err)
+		}
+	}
 	fmt.Println(table)
-	//t := map[parsers.Cell]string{
-	//	parsers.Cell{"1", "A"}:     "1",
-	//	parsers.Cell{"1", "B"}:     "0",
-	//	parsers.Cell{"1", "Cell"}:  "1",
-	//	parsers.Cell{"2", "A"}:     "2",
-	//	parsers.Cell{"2", "B"}:     "6",
-	//	parsers.Cell{"2", "Cell"}:  "0",
-	//	parsers.Cell{"30", "A"}:    "0",
-	//	parsers.Cell{"30", "B"}:    "1",
-	//	parsers.Cell{"30", "Cell"}: "5",
-	//}
-
 	parsers.ParseToCSV(table)
 }

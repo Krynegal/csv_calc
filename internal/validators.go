@@ -2,26 +2,29 @@ package internal
 
 import "unicode"
 
-func ValidateNum(str string) bool {
-	for _, symb := range str {
-		if !unicode.IsDigit(symb) {
+func CheckColumns(columns []string) bool {
+	c := make(map[string]struct{}, 0)
+	for _, column := range columns {
+		if _, ok := c[column]; ok {
 			return false
 		}
+		c[column] = struct{}{}
 	}
-
 	return true
 }
 
-func ValidateValue(str string) (string, bool) {
-	strRune := []rune(str)
-
-	if len(str) != 0 && (!unicode.IsGraphic(strRune[0]) || strRune[0] == '=') {
-		return "string", true
+func IsExpression(val string) bool {
+	if len(val) < 6 || val[0] != '=' {
+		return false
 	}
+	return true
+}
 
-	if ValidateNum(str) {
-		return "int", true
+func IsNumber(val string) bool {
+	for _, c := range val {
+		if !unicode.IsDigit(c) {
+			return false
+		}
 	}
-
-	return "", false
+	return true
 }
