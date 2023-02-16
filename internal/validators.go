@@ -1,6 +1,9 @@
 package internal
 
-import "unicode"
+import (
+	"strings"
+	"unicode"
+)
 
 func CheckColumns(columns []string) bool {
 	c := make(map[string]struct{}, 0)
@@ -14,7 +17,7 @@ func CheckColumns(columns []string) bool {
 }
 
 func IsExpression(val string) bool {
-	if len(val) < 6 || val[0] != '=' {
+	if len(val) < 6 || val[0] != '=' || !strings.ContainsAny(val, "+-*/") {
 		return false
 	}
 	return true

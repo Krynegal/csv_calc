@@ -84,8 +84,11 @@ func SolveTable(table map[models.Cell]string, cellsToCalc []models.Cell) error {
 			return errors.New("this table cannot be solved")
 		}
 		val := table[cellsToCalc[i]]
-		operand1, operand2, op := parseExpr(table, val)
-		if op == "/" && operand2 == "0" {
+		operand1, operand2, operator := parseExpr(table, val)
+		if operand1 == "" || operand2 == "" || operator == "" {
+			return errors.New("link to a non-existent cell")
+		}
+		if operator == "/" && operand2 == "0" {
 			return errors.New("division by zero")
 		}
 		if operand1 == val {
@@ -98,13 +101,14 @@ func SolveTable(table map[models.Cell]string, cellsToCalc []models.Cell) error {
 			continue
 		}
 
-		expression, err := makeExpression(operand1, operand2, op)
+		expression, err := makeExpression(operand1, operand2, operator)
 		if err != nil {
 			return err
 		}
 		result := calcExpression(expression)
 		table[cellsToCalc[i]] = result
 		cellsToCalc = append(cellsToCalc[:i], cellsToCalc[i+1:]...)
+		lastLen = len(cellsToCalc)
 		if i != 0 {
 			i--
 		}

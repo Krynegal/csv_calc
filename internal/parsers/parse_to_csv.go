@@ -14,18 +14,18 @@ func ParseToCSV(table map[models.Cell]string) [][]string {
 		records       [][]string
 	)
 
-	columnsMap := make(map[string]bool)
-	rowsMap := make(map[string]bool)
+	columnsMap := make(map[string]struct{})
+	rowsMap := make(map[string]struct{})
 
 	columns = append(columns, "")
 	for cell := range table {
 		row, column := cell.Row, cell.Column
 		if _, ok := columnsMap[column]; !ok {
-			columnsMap[column] = true
+			columnsMap[column] = struct{}{}
 			columns = append(columns, column)
 		}
 		if _, ok := rowsMap[row]; !ok {
-			rowsMap[row] = true
+			rowsMap[row] = struct{}{}
 			rows = append(rows, row)
 		}
 	}
@@ -53,7 +53,7 @@ func ParseToCSV(table map[models.Cell]string) [][]string {
 	writer.Comma = ','
 	err := writer.WriteAll(records)
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 
 	return nil
