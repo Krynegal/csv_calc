@@ -1,6 +1,7 @@
 package solve
 
 import (
+	"csvCalc/internal"
 	"csvCalc/internal/models"
 	"errors"
 	"fmt"
@@ -44,16 +45,24 @@ func makeExpression(v1, v2, op string) (models.Expression, error) {
 
 func parseExpr(table map[models.Cell]string, val string) (string, string, string) {
 	var args []string
+	var arg1, arg2 string
 	for _, op := range []string{"+", "-", "*", "/"} {
 		if strings.Index(val[1:], op) != -1 {
 			args = strings.Split(val[1:], op)
 
-			cell1 := strToCell(args[0])
-			cell2 := strToCell(args[1])
-
-			v1 := table[cell1]
-			v2 := table[cell2]
-			return v1, v2, op
+			if internal.IsNumber(args[0]) {
+				arg1 = args[0]
+			} else {
+				cell1 := strToCell(args[0])
+				arg1 = table[cell1]
+			}
+			if internal.IsNumber(args[1]) {
+				arg2 = args[1]
+			} else {
+				cell2 := strToCell(args[1])
+				arg2 = table[cell2]
+			}
+			return arg1, arg2, op
 		} else {
 			continue
 		}

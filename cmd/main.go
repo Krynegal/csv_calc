@@ -3,12 +3,12 @@ package main
 import (
 	"csvCalc/internal/parsers"
 	"csvCalc/internal/solve"
-	"fmt"
 	"log"
+	"os"
 )
 
 func main() {
-	filePath := "file.csv"
+	filePath := os.Args[1]
 	records, err := parsers.ReadCSV(filePath)
 	if err != nil {
 		log.Fatal("error while reading file")
@@ -17,14 +17,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(table)
-	fmt.Println(calcCells)
-
 	if len(calcCells) != 0 {
 		if err = solve.SolveTable(table, calcCells); err != nil {
 			log.Fatal(err)
 		}
 	}
-	fmt.Println(table)
 	parsers.ParseToCSV(table)
 }

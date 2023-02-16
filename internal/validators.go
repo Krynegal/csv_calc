@@ -1,8 +1,8 @@
 package internal
 
 import (
+	"strconv"
 	"strings"
-	"unicode"
 )
 
 func CheckColumns(columns []string) bool {
@@ -17,17 +17,16 @@ func CheckColumns(columns []string) bool {
 }
 
 func IsExpression(val string) bool {
-	if len(val) < 6 || val[0] != '=' || !strings.ContainsAny(val, "+-*/") {
+	if len(val) < 4 || val[0] != '=' || !strings.ContainsAny(val, "+-*/") {
 		return false
 	}
 	return true
 }
 
 func IsNumber(val string) bool {
-	for _, c := range val {
-		if !unicode.IsDigit(c) {
-			return false
-		}
+	_, err := strconv.Atoi(val)
+	if err != nil {
+		return false
 	}
 	return true
 }
